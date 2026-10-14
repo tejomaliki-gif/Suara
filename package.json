@@ -6,7 +6,9 @@
   "private": true,
   "scripts": {
     "dev": "node --watch src/server.js",
-    "start": "node src/server.js",
+    "build": "prisma generate",
+    "postinstall": "prisma generate",
+    "start": "prisma db push && node prisma/seed.js && node src/server.js",
     "db:push": "prisma db push",
     "db:seed": "node prisma/seed.js",
     "db:reset": "prisma db push --force-reset && node prisma/seed.js",

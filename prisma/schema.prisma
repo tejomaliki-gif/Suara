@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -12,7 +12,7 @@ model SiteConfig {
   appName         String   @default("SuaraNusantara")
   appSubtitle     String   @default("Peta Aspirasi Rakyat Indonesia")
   heroTitle       String   @default("Suara Warga, Peta Perubahan Indonesia")
-  heroDescription String   @default("Platform pemetaan aspirasi masyarakat dari Aceh hingga Papua untuk mendorong pembangunan yang transparan, tepat sasaran, dan berbasis data spasial.")
+  heroDescription String   @default("Platform pemetaan aspirasi masyarakat dari Aceh hingga Papua untuk mendorong pembangunan yang transparan, tepat sasaran, dan berbasis data spasial.") @db.Text
   primaryLogoUrl  String?
   partnerName     String   @default("Badan Aspirasi & Pembangunan Nasional")
   partnerLabel    String   @default("Instansi Penanggung Jawab")
@@ -77,7 +77,7 @@ model Category {
   id          Int          @id @default(autoincrement())
   name        String
   slug        String       @unique
-  description String?
+  description String?      @db.Text
   color       String       @default("#059669")
   icon        String       @default("AlertCircle")
   isCritical  Boolean      @default(false)
@@ -92,7 +92,7 @@ model Aspiration {
   maskedPhone     String
   phoneVerified   Boolean                   @default(true)
   title           String
-  content         String
+  content         String                    @db.Text
   categoryId      Int
   category        Category                  @relation(fields: [categoryId], references: [id])
   provinceId      Int
@@ -105,13 +105,13 @@ model Aspiration {
   village         Village?                  @relation(fields: [villageId], references: [id])
   districtName    String?
   villageName     String?
-  addressDetail   String?
+  addressDetail   String?                   @db.Text
   latitude        Float
   longitude       Float
   evidenceImage   String?
   resolutionImage String?
   status          String                    @default("MENUNGGU_VERIFIKASI")
-  adminNote       String?
+  adminNote       String?                   @db.Text
   upvotesCount    Int                       @default(1)
   createdAt       DateTime                  @default(now())
   updatedAt       DateTime                  @updatedAt
@@ -124,7 +124,7 @@ model AspirationStatusHistory {
   aspiration   Aspiration @relation(fields: [aspirationId], references: [id], onDelete: Cascade)
   oldStatus    String?
   newStatus    String
-  note         String?
+  note         String?    @db.Text
   updatedBy    String     @default("Administrator")
   createdAt    DateTime   @default(now())
 }

@@ -7,21 +7,31 @@ const routes = require('./routes');
 const { UPLOAD_ROOT } = require('./middleware/uploadMiddleware');
 
 const app = express();
-app.set('trust proxy', 'loopback');
+// Railway & proxy reverse support (X-Forwarded-For)
+app.set('trust proxy', 1);
 
-const origins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
+const origins = (
+  process.env.CORS_ORIGIN ||
+  'https://bajarayanussantara.com,https://www.bajarayanussantara.com,http://localhost:5173,http://127.0.0.1:5173'
+)
   .split(',')
   .map((s) => s.trim())
   .filter(Boolean);
 
 app.use(
   helmet({
-    crossOriginResourcePolicy: { policy: 'cross-origin' }, // gambar /uploads bisa tampil di frontend :5173
+    crossOriginResourcePolicy: { policy: 'cross-origin' }, // gambar /uploads bisa tampil di frontend
   })
 );
 app.use(
   cors({
-    origin: (origin, cb) => cb(null, !origin || origins.includes(origin)),
+    origin: (origin, cb) => {
+      // Izinkan jika tanpa header origin (mobile/curl), atau ada wildcard '*', atau cocok dengan daftar origins
+      if (!origin || origins.includes('*') || origins.includes(origin)) {
+        return cb(null, true);
+      }
+      return cb(null, false);
+    },
     credentials: true,
   })
 );

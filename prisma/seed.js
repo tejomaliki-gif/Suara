@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
-process.env.DATABASE_URL = process.env.DATABASE_URL || 'file:./dev.db';
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 const data = require('./seedData');
