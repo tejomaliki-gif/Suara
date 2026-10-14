@@ -6,13 +6,13 @@
   "private": true,
   "scripts": {
     "dev": "node --watch src/server.js",
-    "build": "prisma generate",
-    "postinstall": "prisma generate",
-    "start": "prisma db push && node prisma/seed.js && node src/server.js",
-    "db:push": "prisma db push",
+    "build": "node node_modules/prisma/build/index.js generate",
+    "postinstall": "node node_modules/prisma/build/index.js generate",
+    "start": "node node_modules/prisma/build/index.js db push && node prisma/seed.js && node src/server.js",
+    "db:push": "node node_modules/prisma/build/index.js db push",
     "db:seed": "node prisma/seed.js",
-    "db:reset": "prisma db push --force-reset && node prisma/seed.js",
-    "setup": "prisma generate && prisma db push && node prisma/seed.js"
+    "db:reset": "node node_modules/prisma/build/index.js db push --force-reset && node prisma/seed.js",
+    "setup": "node node_modules/prisma/build/index.js generate && node node_modules/prisma/build/index.js db push && node prisma/seed.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
@@ -30,9 +30,8 @@
     "helmet": "8.0.0",
     "jsonwebtoken": "9.0.2",
     "multer": "1.4.5-lts.1",
+    "prisma": "5.22.0",
     "zod": "3.23.8"
   },
-  "devDependencies": {
-    "prisma": "5.22.0"
-  }
+  "devDependencies": {}
 }
