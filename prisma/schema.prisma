@@ -1,0 +1,130 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model SiteConfig {
+  id              Int      @id @default(1)
+  appName         String   @default("SuaraNusantara")
+  appSubtitle     String   @default("Peta Aspirasi Rakyat Indonesia")
+  heroTitle       String   @default("Suara Warga, Peta Perubahan Indonesia")
+  heroDescription String   @default("Platform pemetaan aspirasi masyarakat dari Aceh hingga Papua untuk mendorong pembangunan yang transparan, tepat sasaran, dan berbasis data spasial.")
+  primaryLogoUrl  String?
+  partnerName     String   @default("Badan Aspirasi & Pembangunan Nasional")
+  partnerLabel    String   @default("Instansi Penanggung Jawab")
+  partnerLogoUrl  String?
+  showPartnerLogo Boolean  @default(true)
+  updatedAt       DateTime @updatedAt
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("SUPER_ADMIN")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Province {
+  id          Int          @id @default(autoincrement())
+  code        String       @unique
+  name        String
+  latitude    Float        @default(-2.5489)
+  longitude   Float        @default(118.0149)
+  regencies   Regency[]
+  aspirations Aspiration[]
+}
+
+model Regency {
+  id          Int          @id @default(autoincrement())
+  code        String       @unique
+  provinceId  Int
+  name        String
+  type        String       @default("KABUPATEN")
+  latitude    Float?
+  longitude   Float?
+  province    Province     @relation(fields: [provinceId], references: [id])
+  districts   District[]
+  aspirations Aspiration[]
+}
+
+model District {
+  id          Int          @id @default(autoincrement())
+  code        String       @unique
+  regencyId   Int
+  name        String
+  regency     Regency      @relation(fields: [regencyId], references: [id])
+  villages    Village[]
+  aspirations Aspiration[]
+}
+
+model Village {
+  id          Int          @id @default(autoincrement())
+  code        String       @unique
+  districtId  Int
+  name        String
+  district    District     @relation(fields: [districtId], references: [id])
+  aspirations Aspiration[]
+}
+
+model Category {
+  id          Int          @id @default(autoincrement())
+  name        String
+  slug        String       @unique
+  description String?
+  color       String       @default("#059669")
+  icon        String       @default("AlertCircle")
+  isCritical  Boolean      @default(false)
+  aspirations Aspiration[]
+}
+
+model Aspiration {
+  id              Int                       @id @default(autoincrement())
+  trackingCode    String                    @unique
+  senderName      String                    @default("Warga Masyarakat")
+  phone           String
+  maskedPhone     String
+  phoneVerified   Boolean                   @default(true)
+  title           String
+  content         String
+  categoryId      Int
+  category        Category                  @relation(fields: [categoryId], references: [id])
+  provinceId      Int
+  province        Province                  @relation(fields: [provinceId], references: [id])
+  regencyId       Int
+  regency         Regency                   @relation(fields: [regencyId], references: [id])
+  districtId      Int?
+  district        District?                 @relation(fields: [districtId], references: [id])
+  villageId       Int?
+  village         Village?                  @relation(fields: [villageId], references: [id])
+  districtName    String?
+  villageName     String?
+  addressDetail   String?
+  latitude        Float
+  longitude       Float
+  evidenceImage   String?
+  resolutionImage String?
+  status          String                    @default("MENUNGGU_VERIFIKASI")
+  adminNote       String?
+  upvotesCount    Int                       @default(1)
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
+  histories       AspirationStatusHistory[]
+}
+
+model AspirationStatusHistory {
+  id           Int        @id @default(autoincrement())
+  aspirationId Int
+  aspiration   Aspiration @relation(fields: [aspirationId], references: [id], onDelete: Cascade)
+  oldStatus    String?
+  newStatus    String
+  note         String?
+  updatedBy    String     @default("Administrator")
+  createdAt    DateTime   @default(now())
+}
